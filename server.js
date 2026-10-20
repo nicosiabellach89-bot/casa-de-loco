@@ -4,8 +4,9 @@ const state={progress:{markus:0,andrea:0},messages:[],events:[],online:{},starte
 function send(res,status,obj){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(obj))}
 function emit(event){const line='data: '+JSON.stringify(event)+'\n\n';for(const c of clients){try{c.write(line)}catch(e){clients.delete(c)}}}
 function body(req){return new Promise((resolve,reject)=>{let b='';req.on('data',x=>{b+=x;if(b.length>20000){reject(Error('too long'));req.destroy()}});req.on('end',()=>{try{resolve(JSON.parse(b||'{}'))}catch(e){reject(e)}})})}
-function log(type,detail){state.events.push({at:Date.now(),type,detail});state.events=state.events.slice(-100);emit({type:'state',state})}
+function log(type,detail){state.events.push({at:Date.now(),type,detail});state.events=state.events.slice(-100);emit({type:'changed'})}
 const tokens=new Map();
+const prompts=['😈 UHLALAAA! Meine Geheimnisse bleiben geheim!','🧟‍♀️ SCH: ICH HABE DEN KARTON GEGESSEN. WAR DAS WICHTIG?','🦆 QUAK! Die Ente fordert eine Snackpause. Abgelehnt!','🐯 Der Tiger knurrt: Zusammenarbeit, ihr Federwesen!','😈 GRIMAS: Ihr seid so nah dran, dass mein Plüschfell kribbelt!'];
 http.createServer(async(req,res)=>{const url=new URL(req.url,'http://localhost');
 if(req.method==='GET'&&url.pathname==='/'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return fs.createReadStream(__dirname+'/index.html').pipe(res)}
 if(req.method==='GET'&&url.pathname==='/health')return send(res,200,{ok:true});
@@ -16,6 +17,7 @@ if(req.method==='GET'&&url.pathname==='/api/events'){res.writeHead(200,{'Content
 if(req.method==='POST'&&url.pathname==='/api/action'){let d;try{d=await body(req)}catch(e){return send(res,400,{error:'Invalid request'})}
 if(d.action==='chat'){let txt=String(d.text||'').trim().slice(0,400);if(!txt)return send(res,400,{error:'Leere Nachricht'});const as=role==='regie'&&d.as==='grimas'?'GRIMAS':role==='regie'?'Flamosia':role==='markus'?'Flamarkus':'Flandrea';state.messages.push({as,text:txt,at:Date.now()});state.messages=state.messages.slice(-100);log('chat',as);return send(res,200,{ok:true})}
 if(d.action==='answer'&&role!=='regie'){const idx=state.progress[role];const answers=['CHIGO','CHOCOCROSSIES','B','4235','63','SPE','DEGUSTA','8','FLAM','12','MOD','TORAUF'];const v=String(d.answer||'').toUpperCase().replace(/[^A-Z0-9]/g,'');const ok=v===answers[idx];if(ok)state.progress[role]=Math.min(answers.length,idx+1);log('answer',{role,idx,answer:v,ok});return send(res,200,{ok,progress:state.progress[role]})}
+if(d.action==='surprise'&&role==='regie'){const txt=prompts[Math.floor(Math.random()*prompts.length)];state.messages.push({as:'GRIMAS',text:txt,at:Date.now()});state.messages=state.messages.slice(-100);log('surprise','GRIMAS');return send(res,200,{ok:true})}
 if(d.action==='reset'&&role==='regie'){state.progress={markus:0,andrea:0};state.messages=[];log('reset','regie');return send(res,200,{ok:true})}
 return send(res,403,{error:'Nicht erlaubt'})}
 send(res,404,{error:'Not found'})}).listen(port,'0.0.0.0',()=>console.log('CASA listening on '+port));
