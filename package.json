@@ -1,11 +1,11 @@
 {
   "name": "casa-de-loco-live",
-  "version": "1.0.0",
+  "version": "4.1.0",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "postinstall": "node release/install.js --test",
+    "test": "node release/install.js --test",
+    "start": "node release/launch.js"
   },
-  "engines": {
-    "node": ">=18"
-  }
+  "engines": { "node": ">=20" }
 }
