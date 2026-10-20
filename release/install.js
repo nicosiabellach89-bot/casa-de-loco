@@ -27,6 +27,7 @@ const hiresPacked=Buffer.from(hiresEncoded,'base64');
 if(crypto.createHash('sha256').update(hiresPacked).digest('hex')!=='d0f371475bb4feb84540bd4f9a4db5a35df19fae1b3c42c5e655016a399a1643')throw new Error('CASA high-resolution checksum mismatch');
 const hiresFiles=JSON.parse(zlib.brotliDecompressSync(hiresPacked).toString('utf8'));
 for(const [name,entry] of Object.entries(hiresFiles)){
+ if(name==='.env.example'||name==='.gitignore')continue;
  if(!/^(?:public\/[a-zA-Z0-9._/-]+|tests\/[a-zA-Z0-9._/-]+|core\.js|server\.js|package\.json)$/.test(name)||name.split('/').includes('..'))throw new Error('Invalid high-res file path');
  const dest=path.join(root,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,entry.base64?Buffer.from(entry.base64,'base64'):entry.text);
 }
