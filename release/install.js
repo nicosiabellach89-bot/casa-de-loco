@@ -19,15 +19,15 @@ if(fs.existsSync(clientFile)){
  client=client.replace('loading="lazy">','loading="${name===\'home\'||name===\'archive\'?\'eager\':\'lazy\'}">');
  fs.writeFileSync(clientFile,client,'utf8');
 }
-// Apply the checked full-resolution WebP edition over the original low-res release.
-const hiresParts=Array.from({length:6},(_,i)=>fs.readFileSync(path.join(__dirname,'hires-'+String(i+1).padStart(2,'0')+'.b64'),'utf8').replace(/\\s/g,''));
+// Apply verified high-resolution image edition to the extracted game.
+const hiresParts=Array.from({length:6},(_,i)=>fs.readFileSync(path.join(__dirname,'hires-'+String(i+1).padStart(2,'0')+'.b64'),'utf8').replace(/\s/g,''));
 const hiresEncoded=hiresParts.join('');
 if(hiresEncoded.length!==2400576)throw new Error('CASA high-resolution image package incomplete');
 const hiresPacked=Buffer.from(hiresEncoded,'base64');
 if(crypto.createHash('sha256').update(hiresPacked).digest('hex')!=='d0f371475bb4feb84540bd4f9a4db5a35df19fae1b3c42c5e655016a399a1643')throw new Error('CASA high-resolution checksum mismatch');
 const hiresFiles=JSON.parse(zlib.brotliDecompressSync(hiresPacked).toString('utf8'));
 for(const [name,entry] of Object.entries(hiresFiles)){
- if(!/^(?:public\\/[a-zA-Z0-9._/-]+|tests\\/[a-zA-Z0-9._/-]+|core\\.js|server\\.js|package\\.json)$/.test(name)||name.split('/').includes('..'))throw new Error('Invalid high-res file path');
+ if(!/^(?:public\/[a-zA-Z0-9._/-]+|tests\/[a-zA-Z0-9._/-]+|core\.js|server\.js|package\.json)$/.test(name)||name.split('/').includes('..'))throw new Error('Invalid high-res file path');
  const dest=path.join(root,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,entry.base64?Buffer.from(entry.base64,'base64'):entry.text);
 }
 console.log('CASA FULL HD: '+Object.keys(hiresFiles).length+' Dateien inklusive Originalbildern eingespielt.');
