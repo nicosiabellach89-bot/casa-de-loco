@@ -23,7 +23,7 @@ if(fs.existsSync(clientFile)){
  const webpSource='src="${name===\'home\'?window.CASA_HERO:\'assets/\'+esc(name)+\'.webp\'}"';
  client=client.replace('src="assets/${esc(name)}.avif"',heroSource).replace('src="assets/${esc(name)}.webp"',webpSource);
  if(!client.includes('window.CASA_HERO'))throw new Error('Hero-Bildquelle konnte nicht ersetzt werden');
- client='window.CASA_HERO='+JSON.stringify(heroData)+';\\n'+client;
+ client='window.CASA_HERO='+JSON.stringify(heroData)+';'+client;
  fs.writeFileSync(clientFile,client,'utf8');
 }
 console.log('CASA Bildedition: Prüfsumme und '+Object.keys(files).length+' Dateien geprüft.');
