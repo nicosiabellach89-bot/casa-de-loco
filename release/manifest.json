@@ -1,0 +1,8 @@
+{
+  "version": "4.1-bildedition",
+  "encoding": "brotli+base64",
+  "parts": 5,
+  "sha256": "d88667e999da6571f2c879af918a466057b472cc99e24b134a6145192a08b5dc",
+  "bytesBase64": 79360,
+  "note": "Zugangsdaten werden ausschließlich aus der Serverumgebung gelesen."
+}
