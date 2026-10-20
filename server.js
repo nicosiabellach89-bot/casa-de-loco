@@ -9,6 +9,7 @@ const tokens=new Map();
 const prompts=['😈 UHLALAAA! Meine Geheimnisse bleiben geheim!','🧟‍♀️ SCH: ICH HABE DEN KARTON GEGESSEN. WAR DAS WICHTIG?','🦆 QUAK! Die Ente fordert eine Snackpause. Abgelehnt!','🐯 Der Tiger knurrt: Zusammenarbeit, ihr Federwesen!','😈 GRIMAS: Ihr seid so nah dran, dass mein Plüschfell kribbelt!'];
 http.createServer(async(req,res)=>{const url=new URL(req.url,'http://localhost');
 if(req.method==='GET'&&url.pathname==='/'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return fs.createReadStream(__dirname+'/index.html').pipe(res)}
+if(req.method==='GET'&&/^\/scenes\/scene-(0[1-9]|1[0-2])\.svg$/.test(url.pathname)){res.writeHead(200,{'Content-Type':'image/svg+xml; charset=utf-8','Cache-Control':'public,max-age=600','X-Content-Type-Options':'nosniff'});return fs.createReadStream(__dirname+url.pathname).pipe(res)}
 if(req.method==='GET'&&url.pathname==='/cover.svg'){res.writeHead(200,{'Content-Type':'image/svg+xml; charset=utf-8','Cache-Control':'public,max-age=3600','X-Content-Type-Options':'nosniff'});return fs.createReadStream(__dirname+'/cover.svg').pipe(res)}
 if(req.method==='GET'&&url.pathname==='/main.js'){res.writeHead(200,{'Content-Type':'application/javascript; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return fs.createReadStream(__dirname+'/main.js').pipe(res)}
 if(req.method==='GET'&&url.pathname==='/health')return send(res,200,{ok:true});
