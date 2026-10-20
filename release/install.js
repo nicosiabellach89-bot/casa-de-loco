@@ -11,6 +11,15 @@ for(const [name,entry]of Object.entries(files)){
  if(!/^(?:public\/[a-zA-Z0-9._/-]+|tests\/[a-zA-Z0-9._/-]+|core\.js|server\.js|package\.json)$/.test(name)||name.split('/').includes('..'))throw new Error('Ungültiger Release-Pfad');
  const target=path.join(root,name);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,entry.base64?Buffer.from(entry.base64,'base64'):entry.text,'utf8');
 }
+// Hero and first puzzle artwork must load immediately on mobile browsers.
+const clientFile=path.join(root,'public','app.js');
+if(fs.existsSync(clientFile)){
+ let client=fs.readFileSync(clientFile,'utf8');
+ const before=client;
+ client=client.replace('loading="lazy">','loading="${name===\'home\'||name===\'archive\'?\'eager\':\'lazy\'}" fetchpriority="${name===\'home\'?\'high\':\'auto\'}">');
+ if(client===before)throw new Error('Bildlade-Korrektur konnte nicht angewendet werden');
+ fs.writeFileSync(clientFile,client,'utf8');
+}
 console.log('CASA Bildedition: Prüfsumme und '+Object.keys(files).length+' Dateien geprüft.');
 if(process.argv.includes('--test')){
  cp.execFileSync(process.execPath,['--test','tests/core.test.js'],{cwd:root,stdio:'inherit'});
